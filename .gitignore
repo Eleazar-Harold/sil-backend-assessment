@@ -28,3 +28,4 @@ yarn-error.log*
 .env.local
 .env.*.local
 .qodo
+config.yaml

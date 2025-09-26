@@ -33,10 +33,14 @@ func main() {
 	configPath := flag.String("config", "config.yaml", "Path to configuration file")
 	flag.Parse()
 
-	// Load configuration
+	// Load configuration (prefer file, fallback to environment variables)
 	cfg, err := config.Load(*configPath)
 	if err != nil {
-		log.Fatalf("Failed to load configuration: %v", err)
+		log.Printf("Failed to load configuration file %s: %v. Falling back to environment variables.", *configPath, err)
+		cfg, err = config.LoadFromEnv()
+		if err != nil {
+			log.Fatalf("Failed to load configuration from environment: %v", err)
+		}
 	}
 
 	// Connect to database

@@ -155,7 +155,7 @@ func LoadFromEnv() (*Config, error) {
 			Host:     getEnv("DB_HOST", "localhost"),
 			Port:     getEnvInt("DB_PORT", 5432),
 			User:     getEnv("DB_USER", "metabase"),
-			Password: getEnv("DB_PASSWORD", "ffdd1f0a568f407daaa2e176b5fd5481"),
+			Password: getEnv("DB_PASSWORD", ""),
 			DBName:   getEnv("DB_NAME", "sil_backend_assessment_db"),
 			SSLMode:  getEnv("DB_SSL_MODE", "disable"),
 		},
@@ -166,7 +166,7 @@ func LoadFromEnv() (*Config, error) {
 			DB       int    `yaml:"db"`
 		}{
 			Address:  getEnv("REDIS_ADDRESS", "localhost:6379"),
-			Password: getEnv("REDIS_PASSWORD", "ffdd1f0a568f407daaa2e176b5fd5481"),
+			Password: getEnv("REDIS_PASSWORD", ""),
 			DB:       getEnvInt("REDIS_DB", 0),
 		},
 
@@ -176,9 +176,9 @@ func LoadFromEnv() (*Config, error) {
 			RefreshSecret string        `yaml:"jwt_refresh_secret"`
 			RefreshExpiry time.Duration `yaml:"jwt_refresh_expiry"`
 		}{
-			JWTSecret:     getEnv("JWT_SECRET", "your-jwt-secret"),
+			JWTSecret:     getEnv("JWT_SECRET", ""),
 			JWTExpiry:     time.Duration(getEnvInt("JWT_EXPIRY_HOURS", 24)) * time.Hour,
-			RefreshSecret: getEnv("REFRESH_SECRET", "your-refresh-secret"),
+			RefreshSecret: getEnv("REFRESH_SECRET", ""),
 			RefreshExpiry: time.Duration(getEnvInt("REFRESH_EXPIRY_HOURS", 168)) * time.Hour,
 		},
 

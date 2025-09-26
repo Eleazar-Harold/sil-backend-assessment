@@ -57,3 +57,4 @@ migrations:
   dir: cmd/migrate/migrations
   config_dir: ./config
 
+
