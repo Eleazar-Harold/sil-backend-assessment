@@ -1,0 +1,59 @@
+server:
+  rest_port: 8080
+  shutdown_timeout: 30s
+
+database:
+  host: localhost
+  port: 5432
+  user: metabase
+  password: ffdd1f0a568f407daaa2e176b5fd5481
+  dbname: sil_backend_assessment_db
+  sslmode: disable
+
+redis:
+  address: localhost:6379
+  password: ffdd1f0a568f407daaa2e176b5fd5481
+  db: 0
+
+auth:
+  jwt_secret: 296F8dwKsq0A1C92Be/qjAwwPNglarqdCOikNpZfgNGkvQqvC4tsXo0FrV37A29M
+  jwt_expiry: 6h
+  jwt_refresh_secret: DPmHAU/D/+H4OSX9caAZH89Mv5sv6BU3ZbwFxdrj+Ngh9G7xoZ9Zrqh6gVNYFgys
+  jwt_refresh_expiry: 24h
+
+smtp:
+  host: smtp.gmail.com
+  port: 587
+  username: eleazaryewa@gmail.com
+  password: N@z!r!t35.
+  from: eleazaryewa@gmail.com
+  tls: true
+
+at:
+  api_key: atsk_d39a6cd014eb8194ceb2691aa278934b0d3a5cf32e06ad19c5658087624615802c58b737
+  username: haroldyewa@gmail.com
+
+oidc:
+  enabled: true
+  provider_url: https://accounts.google.com
+  client_id: 322472391564-4o963oqerp0o8ckp0tc2kan65crffjr2.apps.googleusercontent.com
+  client_secret: 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
+  redirect_url: http://localhost:8080/auth/oidc/callback
+  scopes:
+    - openid
+    - profile
+    - email
+
+logging:
+  level: info
+  file: sil-backend-assessment.log
+
+metrics:
+  enabled: true
+  port: 9090
+  path: /metrics
+
+migrations:
+  dir: cmd/migrate/migrations
+  config_dir: ./config
+

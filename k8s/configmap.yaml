@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sil-backend-config
+  namespace: sil-backend-assessment
+data:
+  config.yaml: |
+    server:
+      rest_port: 8080
+      shutdown_timeout: 30s
+
+    database:
+      host: postgres-service
+      port: 5432
+      user: sil_user
+      password: sil_password
+      dbname: sil_backend_assessment_db
+      sslmode: disable
+
+    redis:
+      address: redis-service:6379
+      password: ""
+      db: 0
+
+    auth:
+      jwt_secret: your-jwt-secret-key-here
+      jwt_expiry: 6h
+      jwt_refresh_secret: your-refresh-secret-key-here
+      jwt_refresh_expiry: 24h
+
+    smtp:
+      host: smtp.gmail.com
+      port: 587
+      username: your-email@gmail.com
+      password: your-app-password
+      from: your-email@gmail.com
+      tls: true
+
+    at:
+      api_key: your-africas-talking-api-key
+      username: your-africas-talking-username
+      base_url: https://api.africastalking.com
+
+    oidc:
+      enabled: true
+      provider_url: https://accounts.google.com
+      client_id: your-google-client-id
+      client_secret: your-google-client-secret
+      redirect_url: http://localhost:8080/auth/oidc/callback
+      scopes:
+        - openid
+        - profile
+        - email
+
+    logging:
+      level: info
+      file: sil-backend-assessment.log
+
+    metrics:
+      enabled: true
+      port: 9090
+      path: /metrics
+
+    migrations:
+      dir: cmd/migrate/migrations
+      config_dir: /app/config

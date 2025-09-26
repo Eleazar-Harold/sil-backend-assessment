@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIL Backend Assessment - GraphQL API Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+        }
+        .endpoint-info {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .endpoint-url {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #2c3e50;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        code {
+            background: #ecf0f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+        .schema-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #27ae60;
+        }
+        .query-example {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #27ae60;
+        }
+        .mutation-example {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .type-definition {
+            background: #f1f3f4;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+        }
+        .nav-links {
+            background: #3498db;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        .playground-link {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+        .playground-link:hover {
+            background: #219a52;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SIL Backend Assessment - GraphQL API Documentation</h1>
+        
+        <div class="nav-links">
+            <a href="#overview">Overview</a>
+            <a href="#endpoint">Endpoint</a>
+            <a href="#schema">Schema</a>
+            <a href="#queries">Queries</a>
+            <a href="#mutations">Mutations</a>
+            <a href="#types">Types</a>
+            <a href="#examples">Examples</a>
+        </div>
+
+        <div class="endpoint-info">
+            <strong>GraphQL Endpoint:</strong>
+            <div class="endpoint-url">POST http://localhost:8080/graphql</div>
+            <a href="/graphql/playground" class="playground-link" target="_blank">🚀 Open GraphQL Playground</a>
+        </div>
+
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>The SIL Backend Assessment GraphQL API provides a flexible and efficient way to query and manipulate data for users, customers, categories, products, and orders. The API supports both queries for data retrieval and mutations for data modification.</p>
+            
+            <h3>Key Features</h3>
+            <ul>
+                <li><strong>Flexible Queries:</strong> Request exactly the data you need</li>
+                <li><strong>Nested Relationships:</strong> Fetch related data in a single request</li>
+                <li><strong>Type Safety:</strong> Strongly typed schema with validation</li>
+                <li><strong>Real-time Introspection:</strong> Self-documenting API</li>
+                <li><strong>Pagination Support:</strong> Efficient data loading with limit/offset</li>
+            </ul>
+        </section>
+
+        <section id="endpoint">
+            <h2>Endpoint Information</h2>
+            <table>
+                <tr>
+                    <th>Property</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>URL</td>
+                    <td><code>http://localhost:8080/graphql</code></td>
+                </tr>
+                <tr>
+                    <td>Method</td>
+                    <td><code>POST</code></td>
+                </tr>
+                <tr>
+                    <td>Content-Type</td>
+                    <td><code>application/json</code></td>
+                </tr>
+                <tr>
+                    <td>Playground</td>
+                    <td><code>http://localhost:8080/graphql/playground</code></td>
+                </tr>
+            </table>
+        </section>
+
+        <section id="schema">
+            <h2>Schema Overview</h2>
+            <div class="schema-section">
+                <h3>Root Types</h3>
+                <ul>
+                    <li><strong>Query:</strong> Entry point for read operations</li>
+                    <li><strong>Mutation:</strong> Entry point for write operations</li>
+                </ul>
+                
+                <h3>Entity Types</h3>
+                <ul>
+                    <li><strong>User:</strong> System users with JWT authentication</li>
+                    <li><strong>Customer:</strong> Customers with OIDC authentication</li>
+                    <li><strong>Category:</strong> Product categories with hierarchical support</li>
+                    <li><strong>Product:</strong> Products with inventory tracking</li>
+                    <li><strong>Order:</strong> Orders with status tracking and items</li>
+                    <li><strong>OrderItem:</strong> Individual items within orders</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="queries">
+            <h2>Available Queries</h2>
+            
+            <h3>User Queries</h3>
+            <div class="query-example">
+                <h4>Get All Users</h4>
+                <pre><code>query GetUsers($limit: Int, $offset: Int) {
+  users(limit: $limit, offset: $offset) {
+    id
+    name
+    email
+    createdAt
+    updatedAt
+  }
+}</code></pre>
+            </div>
+
+            <div class="query-example">
+                <h4>Get User by ID</h4>
+                <pre><code>query GetUser($id: ID!) {
+  user(id: $id) {
+    id
+    name
+    email
+    createdAt
+    updatedAt
+  }
+}</code></pre>
+            </div>
+
+            <h3>Customer Queries</h3>
+            <div class="query-example">
+                <h4>Get All Customers</h4>
+                <pre><code>query GetCustomers($limit: Int, $offset: Int) {
+  customers(limit: $limit, offset: $offset) {
+    id
+    firstName
+    lastName
+    email
+    phone
+    address
+    city
+    state
+    zipCode
+    country
+    createdAt
+    updatedAt
+  }
+}</code></pre>
+            </div>
+
+            <h3>Category Queries</h3>
+            <div class="query-example">
+                <h4>Get Categories with Hierarchy</h4>
+                <pre><code>query GetCategories($limit: Int, $offset: Int) {
+  categories(limit: $limit, offset: $offset) {
+    id
+    name
+    description
+    parentId
+    parent {
+      id
+      name
+    }
+    children {
+      id
+      name
+    }
+    products {
+      id
+      name
+      price
+    }
+    createdAt
+    updatedAt
+  }
+}</code></pre>
+            </div>
+
+            <h3>Product Queries</h3>
+            <div class="query-example">
+                <h4>Get Products with Category Info</h4>
+                <pre><code>query GetProducts($limit: Int, $offset: Int, $categoryId: ID, $isActive: Boolean) {
+  products(limit: $limit, offset: $offset, categoryId: $categoryId, isActive: $isActive) {
+    id
+    name
+    description
+    sku
+    price
+    stock
+    categoryId
+    category {
+      id
+      name
+      description
+    }
+    isActive
+    createdAt
+    updatedAt
+  }
+}</code></pre>
+            </div>
+
+            <h3>Order Queries</h3>
+            <div class="query-example">
+                <h4>Get Orders with Items and Customer Info</h4>
+                <pre><code>query GetOrders($limit: Int, $offset: Int, $customerId: ID, $status: OrderStatus) {
+  orders(limit: $limit, offset: $offset, customerId: $customerId, status: $status) {
+    id
+    customerId
+    customer {
+      id
+      firstName
+      lastName
+      email
+    }
+    orderNumber
+    status
+    totalAmount
+    shippingAddress
+    billingAddress
+    notes
+    orderDate
+    shippedDate
+    deliveredDate
+    orderItems {
+      id
+      productId
+      product {
+        id
+        name
+        price
+      }
+      quantity
+      unitPrice
+      totalPrice
+    }
+    createdAt
+    updatedAt
+  }
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="mutations">
+            <h2>Available Mutations</h2>
+            
+            <h3>User Mutations</h3>
+            <div class="mutation-example">
+                <h4>Create User</h4>
+                <pre><code>mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    id
+    name
+    email
+    createdAt
+    updatedAt
+  }
+}
+
+# Variables:
+{
+  "input": {
+    "name": "John Doe",
+    "email": "john.doe@example.com"
+  }
+}</code></pre>
+            </div>
+
+            <div class="mutation-example">
+                <h4>Update User</h4>
+                <pre><code>mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
+  updateUser(id: $id, input: $input) {
+    id
+    name
+    email
+    createdAt
+    updatedAt
+  }
+}
+
+# Variables:
+{
+  "id": "user-uuid",
+  "input": {
+    "name": "Jane Doe"
+  }
+}</code></pre>
+            </div>
+
+            <h3>Product Mutations</h3>
+            <div class="mutation-example">
+                <h4>Create Product</h4>
+                <pre><code>mutation CreateProduct($input: CreateProductInput!) {
+  createProduct(input: $input) {
+    id
+    name
+    description
+    sku
+    price
+    stock
+    categoryId
+    category {
+      id
+      name
+    }
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+
+# Variables:
+{
+  "input": {
+    "name": "iPhone 15",
+    "description": "Latest iPhone model",
+    "sku": "IPHONE15-128GB",
+    "price": 999.99,
+    "stock": 50,
+    "categoryId": "category-uuid",
+    "isActive": true
+  }
+}</code></pre>
+            </div>
+
+            <h3>Order Mutations</h3>
+            <div class="mutation-example">
+                <h4>Create Order</h4>
+                <pre><code>mutation CreateOrder($input: CreateOrderInput!) {
+  createOrder(input: $input) {
+    id
+    customerId
+    customer {
+      id
+      firstName
+      lastName
+      email
+    }
+    orderNumber
+    status
+    totalAmount
+    shippingAddress
+    billingAddress
+    notes
+    orderDate
+    orderItems {
+      id
+      productId
+      product {
+        id
+        name
+        price
+      }
+      quantity
+      unitPrice
+      totalPrice
+    }
+    createdAt
+    updatedAt
+  }
+}
+
+# Variables:
+{
+  "input": {
+    "customerId": "customer-uuid",
+    "shippingAddress": "123 Main St, New York, NY 10001",
+    "billingAddress": "123 Main St, New York, NY 10001",
+    "notes": "Please handle with care",
+    "orderItems": [
+      {
+        "productId": "product-uuid",
+        "quantity": 2
+      }
+    ]
+  }
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="types">
+            <h2>Type Definitions</h2>
+            
+            <h3>Scalar Types</h3>
+            <div class="type-definition">
+scalar Time  # RFC3339 formatted date-time string</div>
+
+            <h3>Enums</h3>
+            <div class="type-definition">
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}</div>
+
+            <h3>Core Types</h3>
+            <div class="type-definition">
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Customer {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String
+  address: String
+  city: String
+  state: String
+  zipCode: String
+  country: String
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Category {
+  id: ID!
+  name: String!
+  description: String
+  parentId: ID
+  parent: Category
+  children: [Category!]!
+  products: [Product!]!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Product {
+  id: ID!
+  name: String!
+  description: String
+  sku: String!
+  price: Float!
+  stock: Int!
+  categoryId: ID!
+  category: Category!
+  isActive: Boolean!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Order {
+  id: ID!
+  customerId: ID!
+  customer: Customer!
+  orderNumber: String!
+  status: OrderStatus!
+  totalAmount: Float!
+  shippingAddress: String!
+  billingAddress: String!
+  notes: String
+  orderDate: Time!
+  shippedDate: Time
+  deliveredDate: Time
+  orderItems: [OrderItem!]!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type OrderItem {
+  id: ID!
+  orderId: ID!
+  productId: ID!
+  product: Product!
+  quantity: Int!
+  unitPrice: Float!
+  totalPrice: Float!
+  createdAt: Time!
+  updatedAt: Time!
+}</div>
+
+            <h3>Input Types</h3>
+            <div class="type-definition">
+input CreateUserInput {
+  name: String!
+  email: String!
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+}
+
+input CreateProductInput {
+  name: String!
+  description: String
+  sku: String!
+  price: Float!
+  stock: Int!
+  categoryId: ID!
+  isActive: Boolean
+}
+
+input CreateOrderInput {
+  customerId: ID!
+  shippingAddress: String!
+  billingAddress: String!
+  notes: String
+  orderItems: [CreateOrderItemInput!]!
+}
+
+input CreateOrderItemInput {
+  productId: ID!
+  quantity: Int!
+}</div>
+        </section>
+
+        <section id="examples">
+            <h2>Complete Examples</h2>
+            
+            <h3>Complex Query Example</h3>
+            <div class="query-example">
+                <h4>Get Order with Full Details</h4>
+                <pre><code>query GetOrderDetails($orderId: ID!) {
+  order(id: $orderId) {
+    id
+    orderNumber
+    status
+    totalAmount
+    orderDate
+    shippedDate
+    deliveredDate
+    customer {
+      id
+      firstName
+      lastName
+      email
+      phone
+      address
+      city
+      state
+      zipCode
+      country
+    }
+    orderItems {
+      id
+      quantity
+      unitPrice
+      totalPrice
+      product {
+        id
+        name
+        description
+        sku
+        price
+        category {
+          id
+          name
+          description
+        }
+      }
+    }
+    shippingAddress
+    billingAddress
+    notes
+    createdAt
+    updatedAt
+  }
+}</code></pre>
+            </div>
+
+            <h3>Batch Operations Example</h3>
+            <div class="mutation-example">
+                <h4>Create Category and Product in One Request</h4>
+                <pre><code>mutation CreateCategoryAndProduct(
+  $categoryInput: CreateCategoryInput!,
+  $productInput: CreateProductInput!
+) {
+  createCategory(input: $categoryInput) {
+    id
+    name
+    description
+  }
+  createProduct(input: $productInput) {
+    id
+    name
+    sku
+    price
+    category {
+      id
+      name
+    }
+  }
+}</code></pre>
+            </div>
+
+            <h3>Using Variables</h3>
+            <div class="query-example">
+                <h4>Filtered Product Search</h4>
+                <pre><code># Query
+query SearchProducts(
+  $limit: Int = 10,
+  $offset: Int = 0,
+  $categoryId: ID,
+  $isActive: Boolean = true
+) {
+  products(
+    limit: $limit,
+    offset: $offset,
+    categoryId: $categoryId,
+    isActive: $isActive
+  ) {
+    id
+    name
+    price
+    stock
+    category {
+      name
+    }
+  }
+}
+
+# Variables
+{
+  "limit": 20,
+  "offset": 0,
+  "categoryId": "electronics-category-uuid",
+  "isActive": true
+}</code></pre>
+            </div>
+        </section>
+
+        <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 5px; text-align: center;">
+            <h3>Interactive Exploration</h3>
+            <p>For the best experience exploring the GraphQL API, use the interactive playground:</p>
+            <a href="/graphql/playground" class="playground-link" target="_blank">🚀 Open GraphQL Playground</a>
+            <p><small>The playground provides auto-completion, schema exploration, and real-time query execution.</small></p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=metabase
+      - DB_PASSWORD=ffdd1f0a568f407daaa2e176b5fd5481
+      - DB_NAME=sil_backend_assessment_db
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6379
+    depends_on:
+      
+      postgres:
+        condition: service_healthy
+      
+      
+      redis:
+        condition: service_healthy
+      
+      
+      
+    networks:
+      - silbackendassessment-network
+    healthcheck:
+      # Assuming your app has a /healthz endpoint and curl is installed
+      # Adjust the path and command if needed (e.g., use wget if curl isn't available)
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+  
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=metabase
+      - POSTGRES_PASSWORD=ffdd1f0a568f407daaa2e176b5fd5481
+      - POSTGRES_DB=sil_backend_assessment_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - silbackendassessment-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  
+  
+  redis:
+    image: redis:8-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - silbackendassessment-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  
+  
+  prometheus:
+    image: prom/prometheus:v2.49.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - silbackendassessment-network
+    healthcheck:
+      # Using wget as it's more likely than curl in minimal images
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:9090/-/healthy || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+  
+  
+  grafana:
+    image: grafana/grafana:12.0.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_healthy # Wait for prometheus to be healthy
+    networks:
+      - silbackendassessment-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+  
+  
+  
+volumes:
+  
+  
+  postgres-data: {}
+  
+  
+  redis-data: {}
+  
+  
+  grafana-data: {}
+  
+  
+networks:
+  silbackendassessment-network:
+    driver: bridge

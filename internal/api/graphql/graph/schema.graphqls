@@ -1,0 +1,632 @@
+# GraphQL Schema for SIL Backend Assessment
+# This schema provides comprehensive API access to users, customers, categories, products, and orders
+# with full CRUD operations and relationship queries.
+
+"""
+Custom scalar type for handling time values in RFC3339 format
+"""
+scalar Time
+
+"""
+Authorization directive requiring a valid JWT or OIDC context
+"""
+directive @auth(scope: AuthScope = ANY) on FIELD_DEFINITION
+
+"""
+Authentication scope
+"""
+enum AuthScope {
+  ANY
+  USER
+  CUSTOMER
+}
+
+# ============================================================================
+# CORE TYPES
+# ============================================================================
+
+"""
+User represents a system user with JWT authentication
+"""
+type User {
+  "Unique identifier for the user"
+  id: ID!
+  "Full name of the user"
+  name: String!
+  "Email address (must be unique)"
+  email: String!
+  "Timestamp when the user was created"
+  createdAt: Time!
+  "Timestamp when the user was last updated"
+  updatedAt: Time!
+}
+
+"""
+Customer represents a customer with OIDC authentication
+"""
+type Customer {
+  "Unique identifier for the customer"
+  id: ID!
+  "Customer's first name"
+  firstName: String!
+  "Customer's last name"
+  lastName: String!
+  "Email address (must be unique)"
+  email: String!
+  "Phone number (optional)"
+  phone: String
+  "Street address (optional)"
+  address: String
+  "City (optional)"
+  city: String
+  "State or province (optional)"
+  state: String
+  "ZIP or postal code (optional)"
+  zipCode: String
+  "Country (optional)"
+  country: String
+  "Orders placed by this customer"
+  orders: [Order!]!
+  "Timestamp when the customer was created"
+  createdAt: Time!
+  "Timestamp when the customer was last updated"
+  updatedAt: Time!
+}
+
+"""
+Category represents a product category with hierarchical support
+"""
+type Category {
+  "Unique identifier for the category"
+  id: ID!
+  "Category name"
+  name: String!
+  "Category description (optional)"
+  description: String
+  "Parent category ID (null for root categories)"
+  parentId: ID
+  "Parent category (null for root categories)"
+  parent: Category
+  "Child categories"
+  children: [Category!]!
+  "Products in this category"
+  products: [Product!]!
+  "Timestamp when the category was created"
+  createdAt: Time!
+  "Timestamp when the category was last updated"
+  updatedAt: Time!
+}
+
+"""
+Product represents a product with inventory tracking
+"""
+type Product {
+  "Unique identifier for the product"
+  id: ID!
+  "Product name"
+  name: String!
+  "Product description (optional)"
+  description: String
+  "Stock Keeping Unit (must be unique)"
+  sku: String!
+  "Product price"
+  price: Float!
+  "Available stock quantity"
+  stock: Int!
+  "Category ID this product belongs to"
+  categoryId: ID!
+  "Category this product belongs to"
+  category: Category!
+  "Whether the product is active and available for sale"
+  isActive: Boolean!
+  "Order items for this product"
+  orderItems: [OrderItem!]!
+  "Timestamp when the product was created"
+  createdAt: Time!
+  "Timestamp when the product was last updated"
+  updatedAt: Time!
+}
+
+"""
+OrderItem represents an item within an order
+"""
+type OrderItem {
+  "Unique identifier for the order item"
+  id: ID!
+  "Order ID this item belongs to"
+  orderId: ID!
+  "Product ID for this item"
+  productId: ID!
+  "Product details for this item"
+  product: Product!
+  "Quantity ordered"
+  quantity: Int!
+  "Unit price at time of order"
+  unitPrice: Float!
+  "Total price for this item (quantity * unitPrice)"
+  totalPrice: Float!
+  "Timestamp when the order item was created"
+  createdAt: Time!
+  "Timestamp when the order item was last updated"
+  updatedAt: Time!
+}
+
+"""
+Order represents a customer order with status tracking
+"""
+type Order {
+  "Unique identifier for the order"
+  id: ID!
+  "Customer ID who placed the order"
+  customerId: ID!
+  "Customer who placed the order"
+  customer: Customer!
+  "Human-readable order number"
+  orderNumber: String!
+  "Current order status"
+  status: OrderStatus!
+  "Total order amount"
+  totalAmount: Float!
+  "Shipping address"
+  shippingAddress: String!
+  "Billing address"
+  billingAddress: String!
+  "Additional notes (optional)"
+  notes: String
+  "Date when the order was placed"
+  orderDate: Time!
+  "Date when the order was shipped (optional)"
+  shippedDate: Time
+  "Date when the order was delivered (optional)"
+  deliveredDate: Time
+  "Items in this order"
+  orderItems: [OrderItem!]!
+  "Timestamp when the order was created"
+  createdAt: Time!
+  "Timestamp when the order was last updated"
+  updatedAt: Time!
+}
+
+# ============================================================================
+# ENUMS
+# ============================================================================
+
+"""
+OrderStatus represents the current status of an order
+"""
+enum OrderStatus {
+  "Order has been placed but not yet confirmed"
+  PENDING
+  "Order has been confirmed and is being prepared"
+  CONFIRMED
+  "Order is being processed"
+  PROCESSING
+  "Order has been shipped"
+  SHIPPED
+  "Order has been delivered"
+  DELIVERED
+  "Order has been cancelled"
+  CANCELLED
+}
+
+# ============================================================================
+# INPUT TYPES
+# ============================================================================
+
+"""
+Input for creating a new user
+"""
+input CreateUserInput {
+  "Full name of the user"
+  name: String!
+  "Email address (must be unique)"
+  email: String!
+}
+
+"""
+Input for updating an existing user
+"""
+input UpdateUserInput {
+  "Full name of the user"
+  name: String
+  "Email address (must be unique)"
+  email: String
+}
+
+"""
+Input for creating a new customer
+"""
+input CreateCustomerInput {
+  "Customer's first name"
+  firstName: String!
+  "Customer's last name"
+  lastName: String!
+  "Email address (must be unique)"
+  email: String!
+  "Phone number (optional)"
+  phone: String
+  "Street address (optional)"
+  address: String
+  "City (optional)"
+  city: String
+  "State or province (optional)"
+  state: String
+  "ZIP or postal code (optional)"
+  zipCode: String
+  "Country (optional)"
+  country: String
+}
+
+"""
+Input for updating an existing customer
+"""
+input UpdateCustomerInput {
+  "Customer's first name"
+  firstName: String
+  "Customer's last name"
+  lastName: String
+  "Phone number"
+  phone: String
+  "Street address"
+  address: String
+  "City"
+  city: String
+  "State or province"
+  state: String
+  "ZIP or postal code"
+  zipCode: String
+  "Country"
+  country: String
+}
+
+"""
+Input for creating a new category
+"""
+input CreateCategoryInput {
+  "Category name"
+  name: String!
+  "Category description (optional)"
+  description: String
+  "Parent category ID (optional, null for root categories)"
+  parentId: ID
+}
+
+"""
+Input for updating an existing category
+"""
+input UpdateCategoryInput {
+  "Category name"
+  name: String
+  "Category description"
+  description: String
+  "Parent category ID (null for root categories)"
+  parentId: ID
+}
+
+"""
+Input for creating a new product
+"""
+input CreateProductInput {
+  "Product name"
+  name: String!
+  "Product description (optional)"
+  description: String
+  "Stock Keeping Unit (must be unique)"
+  sku: String!
+  "Product price"
+  price: Float!
+  "Initial stock quantity"
+  stock: Int!
+  "Category ID this product belongs to"
+  categoryId: ID!
+  "Whether the product is active (defaults to true)"
+  isActive: Boolean
+}
+
+"""
+Input for updating an existing product
+"""
+input UpdateProductInput {
+  "Product name"
+  name: String
+  "Product description"
+  description: String
+  "Stock Keeping Unit (must be unique)"
+  sku: String
+  "Product price"
+  price: Float
+  "Stock quantity"
+  stock: Int
+  "Category ID this product belongs to"
+  categoryId: ID
+  "Whether the product is active"
+  isActive: Boolean
+}
+
+"""
+Input for creating an order item
+"""
+input CreateOrderItemInput {
+  "Product ID for this item"
+  productId: ID!
+  "Quantity to order"
+  quantity: Int!
+}
+
+"""
+Input for creating a new order
+"""
+input CreateOrderInput {
+  "Customer ID placing the order"
+  customerId: ID!
+  "Shipping address"
+  shippingAddress: String!
+  "Billing address"
+  billingAddress: String!
+  "Additional notes (optional)"
+  notes: String
+  "Items to include in the order"
+  orderItems: [CreateOrderItemInput!]!
+}
+
+"""
+Input for updating an existing order
+"""
+input UpdateOrderInput {
+  "Order status"
+  status: OrderStatus
+  "Shipping address"
+  shippingAddress: String
+  "Billing address"
+  billingAddress: String
+  "Additional notes"
+  notes: String
+  "Date when the order was shipped"
+  shippedDate: Time
+  "Date when the order was delivered"
+  deliveredDate: Time
+}
+
+"""
+Input for filtering and pagination
+"""
+input PaginationInput {
+  "Maximum number of items to return (default: 10, max: 100)"
+  limit: Int
+  "Number of items to skip (default: 0)"
+  offset: Int
+}
+
+"""
+Input for filtering products
+"""
+input ProductFilterInput {
+  "Filter by category ID"
+  categoryId: ID
+  "Filter by active status"
+  isActive: Boolean
+  "Search by name or description"
+  search: String
+  "Minimum price"
+  minPrice: Float
+  "Maximum price"
+  maxPrice: Float
+  "Minimum stock"
+  minStock: Int
+}
+
+"""
+Input for filtering orders
+"""
+input OrderFilterInput {
+  "Filter by customer ID"
+  customerId: ID
+  "Filter by order status"
+  status: OrderStatus
+  "Filter by date range - start date"
+  startDate: Time
+  "Filter by date range - end date"
+  endDate: Time
+}
+
+# ============================================================================
+# QUERIES
+# ============================================================================
+
+"""
+Root query type providing read access to all entities
+"""
+type Query {
+  # User queries
+  "Get all users with optional pagination"
+  users(pagination: PaginationInput): [User!]! @auth(scope: USER)
+  "Get a specific user by ID"
+  user(id: ID!): User @auth(scope: USER)
+  "Search users by name or email"
+  searchUsers(query: String!, pagination: PaginationInput): [User!]! @auth(scope: USER)
+
+  # Customer queries
+  "Get all customers with optional pagination"
+  customers(pagination: PaginationInput): [Customer!]! @auth(scope: ANY)
+  "Get a specific customer by ID"
+  customer(id: ID!): Customer @auth(scope: ANY)
+  "Search customers by name or email"
+  searchCustomers(query: String!, pagination: PaginationInput): [Customer!]! @auth(scope: ANY)
+
+  # Category queries
+  "Get all categories with optional pagination"
+  categories(pagination: PaginationInput): [Category!]! @auth(scope: ANY)
+  "Get a specific category by ID"
+  category(id: ID!): Category @auth(scope: ANY)
+  "Get root categories (categories without parents)"
+  rootCategories(pagination: PaginationInput): [Category!]! @auth(scope: ANY)
+  "Get subcategories of a specific category"
+  subcategories(parentId: ID!, pagination: PaginationInput): [Category!]! @auth(scope: ANY)
+
+  # Product queries
+  "Get all products with optional filtering and pagination"
+  products(filter: ProductFilterInput, pagination: PaginationInput): [Product!]! @auth(scope: ANY)
+  "Get a specific product by ID"
+  product(id: ID!): Product @auth(scope: ANY)
+  "Get products by category"
+  productsByCategory(categoryId: ID!, pagination: PaginationInput): [Product!]! @auth(scope: ANY)
+  "Get active products only"
+  activeProducts(pagination: PaginationInput): [Product!]! @auth(scope: ANY)
+  "Search products by name, description, or SKU"
+  searchProducts(query: String!, pagination: PaginationInput): [Product!]! @auth(scope: ANY)
+
+  # Order queries
+  "Get all orders with optional filtering and pagination"
+  orders(filter: OrderFilterInput, pagination: PaginationInput): [Order!]! @auth(scope: ANY)
+  "Get a specific order by ID"
+  order(id: ID!): Order @auth(scope: ANY)
+  "Get orders by customer"
+  ordersByCustomer(customerId: ID!, pagination: PaginationInput): [Order!]! @auth(scope: ANY)
+  "Get orders by status"
+  ordersByStatus(status: OrderStatus!, pagination: PaginationInput): [Order!]! @auth(scope: USER)
+  "Get order by order number"
+  orderByNumber(orderNumber: String!): Order @auth(scope: ANY)
+
+  # Analytics queries
+  "Get order statistics"
+  orderStats: OrderStats! @auth(scope: USER)
+  "Get product statistics"
+  productStats: ProductStats! @auth(scope: USER)
+  "Get customer statistics"
+  customerStats: CustomerStats! @auth(scope: USER)
+}
+
+# ============================================================================
+# MUTATIONS
+# ============================================================================
+
+"""
+Root mutation type providing write access to all entities
+"""
+type Mutation {
+  # User mutations
+  "Create a new user"
+  createUser(input: CreateUserInput!): User! @auth(scope: USER)
+  "Update an existing user"
+  updateUser(id: ID!, input: UpdateUserInput!): User! @auth(scope: USER)
+  "Delete a user"
+  deleteUser(id: ID!): Boolean! @auth(scope: USER)
+
+  # Customer mutations
+  "Create a new customer"
+  createCustomer(input: CreateCustomerInput!): Customer! @auth(scope: ANY)
+  "Update an existing customer"
+  updateCustomer(id: ID!, input: UpdateCustomerInput!): Customer! @auth(scope: ANY)
+  "Delete a customer"
+  deleteCustomer(id: ID!): Boolean! @auth(scope: USER)
+
+  # Category mutations
+  "Create a new category"
+  createCategory(input: CreateCategoryInput!): Category! @auth(scope: USER)
+  "Update an existing category"
+  updateCategory(id: ID!, input: UpdateCategoryInput!): Category! @auth(scope: USER)
+  "Delete a category"
+  deleteCategory(id: ID!): Boolean! @auth(scope: USER)
+
+  # Product mutations
+  "Create a new product"
+  createProduct(input: CreateProductInput!): Product! @auth(scope: USER)
+  "Update an existing product"
+  updateProduct(id: ID!, input: UpdateProductInput!): Product! @auth(scope: USER)
+  "Delete a product"
+  deleteProduct(id: ID!): Boolean! @auth(scope: USER)
+  "Update product stock"
+  updateProductStock(id: ID!, stock: Int!): Product! @auth(scope: USER)
+
+  # Order mutations
+  "Create a new order"
+  createOrder(input: CreateOrderInput!): Order! @auth(scope: ANY)
+  "Update an existing order"
+  updateOrder(id: ID!, input: UpdateOrderInput!): Order! @auth(scope: ANY)
+  "Delete an order"
+  deleteOrder(id: ID!): Boolean! @auth(scope: USER)
+  "Cancel an order"
+  cancelOrder(id: ID!): Order! @auth(scope: ANY)
+  "Ship an order"
+  shipOrder(id: ID!): Order! @auth(scope: USER)
+  "Mark order as delivered"
+  deliverOrder(id: ID!): Order! @auth(scope: USER)
+}
+
+# ============================================================================
+# STATISTICS TYPES
+# ============================================================================
+
+"""
+Order statistics
+"""
+type OrderStats {
+  "Total number of orders"
+  totalOrders: Int!
+  "Total revenue"
+  totalRevenue: Float!
+  "Orders by status"
+  ordersByStatus: [OrderStatusCount!]!
+  "Average order value"
+  averageOrderValue: Float!
+  "Orders today"
+  ordersToday: Int!
+  "Revenue today"
+  revenueToday: Float!
+}
+
+"""
+Order count by status
+"""
+type OrderStatusCount {
+  "Order status"
+  status: OrderStatus!
+  "Number of orders with this status"
+  count: Int!
+}
+
+"""
+Product statistics
+"""
+type ProductStats {
+  "Total number of products"
+  totalProducts: Int!
+  "Active products"
+  activeProducts: Int!
+  "Inactive products"
+  inactiveProducts: Int!
+  "Low stock products (stock < 10)"
+  lowStockProducts: Int!
+  "Out of stock products"
+  outOfStockProducts: Int!
+  "Total inventory value"
+  totalInventoryValue: Float!
+}
+
+"""
+Customer statistics
+"""
+type CustomerStats {
+  "Total number of customers"
+  totalCustomers: Int!
+  "New customers this month"
+  newCustomersThisMonth: Int!
+  "Customers with orders"
+  customersWithOrders: Int!
+  "Top customers by order value"
+  topCustomers: [CustomerOrderSummary!]!
+}
+
+"""
+Customer order summary
+"""
+type CustomerOrderSummary {
+  "Customer information"
+  customer: Customer!
+  "Total orders placed"
+  totalOrders: Int!
+  "Total amount spent"
+  totalSpent: Float!
+  "Last order date"
+  lastOrderDate: Time
+}
