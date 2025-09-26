@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/99designs/gqlgen v0.17.78
 	github.com/coreos/go-oidc/v3 v3.15.0
-	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/nats-io/nats.go v1.31.0
